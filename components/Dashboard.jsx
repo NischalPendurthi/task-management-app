@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { ResponsiveBar } from "@nivo/bar";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
+import { useState, useEffect } from "react";
+
 export default function Component() {
   // Assuming you have fetched data from Prisma and stored in state
 const [overdueTasks, setOverdueTasks] = useState([]);
@@ -22,36 +24,17 @@ const [upcomingTasks, setUpcomingTasks] = useState([]);
 
 // Fetch data from Prisma here...
 useEffect(() => {
-  setOverdueTasks(fetchData());
+  fetchData();
 }, []);
 
-async function fetchData(){
-  const tasks = await prisma.task.findMany({
-    where: {status: 'completed'}, // adjust the condition as per your requirements
-    include: {
-      assignedTo: {
-        select: {username: true} // assuming 'username' is a field in the 'User' model
-      }
-    }
-  })
-  return tasks;
+async function fetchData() {
+  const response = await fetch('http://localhost:3000/api/tasks')
+  const tasks = await response.json()
+  setOverdueTasks(tasks);
+console.log(tasks)
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+console.log(overdueTasks)
 
 
   return (
@@ -130,7 +113,7 @@ async function fetchData(){
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {upcomingTasks.map((task) => (
+                  {overdueTasks.map((task) => (
                     <TableRow key={task.id}>
                       <TableCell className="font-medium">{task.name}</TableCell>
                       <TableCell>{task.dueDate}</TableCell>
