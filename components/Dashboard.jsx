@@ -19,23 +19,21 @@ import { useState, useEffect } from "react";
 
 export default function Component() {
   // Assuming you have fetched data from Prisma and stored in state
-const [overdueTasks, setOverdueTasks] = useState([]);
-const [upcomingTasks, setUpcomingTasks] = useState([]);
+  const [overdueTasks, setOverdueTasks] = useState([]);
+  const [upcomingTasks, setUpcomingTasks] = useState([]);
 
-// Fetch data from Prisma here...
-useEffect(() => {
-  fetchData();
-}, []);
+  // Fetch data from Prisma here...
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-async function fetchData() {
-  const response = await fetch('http://localhost:3000/api/tasks')
-  const tasks = await response.json()
-  setOverdueTasks(tasks);
-console.log(tasks)
-
-}
-console.log(overdueTasks)
-
+  async function fetchData() {
+    const response = await fetch("http://localhost:3000/api/tasks");
+    const tasks = await response.json();
+    setOverdueTasks(tasks);
+    console.log(tasks);
+  }
+  // console.log(overdueTasks);    
 
   return (
     <div className="flex flex-col h-full">
@@ -115,8 +113,8 @@ console.log(overdueTasks)
                 <TableBody>
                   {overdueTasks.map((task) => (
                     <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.name}</TableCell>
-                      <TableCell>{task.dueDate}</TableCell>
+                      <TableCell className="font-medium">{task.title}</TableCell>
+                      <TableCell> {new Date(task.dueDate).toLocaleString('default', { month: 'long' })} {new Date(task.dueDate).getDate()}, {new Date(task.dueDate).getFullYear()}</TableCell>
                       <TableCell>{task.priority}</TableCell>
                       <TableCell>{task.status}</TableCell>
                     </TableRow>

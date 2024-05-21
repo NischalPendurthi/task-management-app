@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar";
 import {
@@ -7,8 +8,20 @@ import {
   DropdownMenuContent,
   DropdownMenu,
 } from "@/components/ui/dropdown-menu";
+import { signIn, signOut, useSession, getProviders } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Component() {
+  const { data: session } = useSession();
+  const [providers, setProviders] = useState(null);
+  useEffect(() => {
+    const setUpProviders = async () => {
+      const response = await getProviders();
+      setProviders(response);
+    };
+    setUpProviders();
+  });
   return (
     <header className="flex items-center justify-between h-16 px-4 md:px-6 bg-gray-900 text-white">
       <Link className="flex items-center gap-2" href="/">
@@ -26,38 +39,54 @@ export default function Component() {
           <SettingsIcon className="mr-2 h-4 w-4" />
         </Link>
       </nav>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar className="h-9 w-9">
-            <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
-            <AvatarFallback>JP</AvatarFallback>
-            <span className="sr-only">Toggle user menu</span>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>
-            <UserIcon className="mr-2 h-4 w-4" />
-            <Link className="hover:underline" href="/profile">
-              {" "}
-              Profile
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <SettingsIcon className="mr-2 h-4 w-4" />
-            <span>
-              <Link className="hover:underline" href="/settings">
+      {session?.user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-9 w-9">
+              <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
+              <AvatarFallback>JP</AvatarFallback>
+              <span className="sr-only">Toggle user menu</span>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              <UserIcon className="mr-2 h-4 w-4" />
+              <Link className="hover:underline" href={`/profile/${session?.user.id}`}>
                 {" "}
-                Settings
+                Profile
               </Link>
-            </span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <LogOutIcon className="mr-2 h-4 w-4" />
-            <span>Logout</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <SettingsIcon className="mr-2 h-4 w-4" />
+              <span>
+                <Link className="hover:underline" href="/settings">
+                  {" "}
+                  Settings
+                </Link>
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <LogOutIcon className="mr-2 h-4 w-4" />
+              <button onClick={() => signOut()}>Logout</button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div className="flex gap-3 md:gap-5">
+          {providers &&
+            Object.values(providers).map((provider) => (
+              <button
+                type="button"
+                key={provider.name}
+                onClick={() => signIn(provider.id)}
+                className="text-xl"
+              >
+                Sign In
+              </button>
+            ))}
+        </div>
+      )}
     </header>
   );
 }
