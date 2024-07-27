@@ -18,16 +18,16 @@ export const PUT = async (request, { params }) => {
   }
 };
 
-export const GET_BY_ID = async ({ params }) => {
+export const GET = async (request,{ params }) => {
   try {
-    const id = params.userId;
-    console.log(id);
+    // const userId = params.userId; // Access the parameter as params.userId
+    // console.log(userId); // Log the userId for debugging
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: params.userId }, // Use userId instead of id
     });
 
     return new Response(JSON.stringify(user), { status: 200 });
   } catch (error) {
-    return new Response(`Failed to fetch user info `, { status: 500 });
+    return new Response(`Failed to fetch user info ${error} `, { status: 500 });
   }
 };

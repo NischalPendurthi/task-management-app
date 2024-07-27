@@ -1,4 +1,4 @@
-export const handleSaveChanges = async (e,session, username, bio) => {
+export const handleSaveChanges = async (e, session, username, bio) => {
   e.preventDefault();
 
   try {

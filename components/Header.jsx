@@ -44,14 +44,14 @@ export default function Component() {
           <DropdownMenuTrigger asChild>
             <Avatar className="h-9 w-9">
               <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
-              <AvatarFallback>JP</AvatarFallback>
+              <AvatarFallback>{(session?.user.name.charAt(0).toUpperCase())}</AvatarFallback>
               <span className="sr-only">Toggle user menu</span>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               <UserIcon className="mr-2 h-4 w-4" />
-              <Link className="hover:underline" href={`/profile/${session?.user.id}`}>
+              <Link className="" href={`/profile/${session?.user.id}`}>
                 {" "}
                 Profile
               </Link>
@@ -59,7 +59,7 @@ export default function Component() {
             <DropdownMenuItem>
               <SettingsIcon className="mr-2 h-4 w-4" />
               <span>
-                <Link className="hover:underline" href="/settings">
+                <Link className="" href="/settings">
                   {" "}
                   Settings
                 </Link>

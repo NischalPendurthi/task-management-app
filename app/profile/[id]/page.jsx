@@ -25,36 +25,41 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { handleSaveChanges } from '@/app/api/apiFunctions';
+import { handleSaveChanges } from "@/app/api/apiFunctions";
 
-
-export default function Component({params}) {
+export default function Component({ params }) {
   const { data: session } = useSession();
   console.log(session?.user, "hi");
   const router = useRouter();
   const [username, setUsername] = useState(session?.user.name);
   const [bio, setBio] = useState(session?.user.bio);
-
+  const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [email, setEmail] = useState(session?.user.email);
   const [profilePicture, setProfilePicture] = useState("/placeholder-user.png");
-  const [profile, setProfile] = useState({})
-  const fetchProfile = async () => {
-    try{
-      const response = await fetch(`http://localhost:3000/api/users/${params.id}`,{method: "GET_BY_ID"});
-      const data = await response.json();
-      console.log(data)
-      setProfile(data);
-    }
-    catch(error){
-      console.log('Error fetching Profile:', error)
-    }
-    
-  };
-  
+  const [isEditProfileClicked, setIsEditProfileClicked] = useState(false);
+  const [profile, setProfile] = useState({});
   useEffect(() => {
     fetchProfile();
   }, []);
-  
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/users/${params.id}`,
+        { method: "GET" }
+      );
+      const data = await response.json();
+      console.log(data);
+      setProfile(data);
+      setIsEditProfileClicked(false);
+      setIsProfileUpdated(true);
+      window.location.reload();
+
+    } catch (error) {
+      console.log("Error fetching Profile:", error);
+    }
+  };
+
+
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
@@ -106,55 +111,70 @@ export default function Component({params}) {
                   <AvatarFallback>JP</AvatarFallback>
                 </Avatar>
                 <div className="grid gap-1">
-                  <h1 className="text-2xl font-bold">{session?.user.name}</h1>
+                  <h1 className="text-2xl font-bold">{username}</h1>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {session?.user.email}
+                    {email}
                   </p>
                 </div>
-                <Button className="ml-auto" size="sm" variant="outline">
+                <Button
+                  className="ml-auto"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditProfileClicked(true)}
+                >
                   Edit Profile
                 </Button>
               </div>
               <Separator />
-              <div className="grid gap-4">
-                <h2 className="text-lg font-semibold">Profile Information</h2>
-                <form className="grid gap-4" onSubmit={(e) => handleSaveChanges(e, session, username, bio)}>
-                  <div className="grid gap-2">
-                    <Label htmlFor="username">Username</Label>
-                    <Input
-                      
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      id="username"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="text">Bio</Label>
-                    <Input
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      
-                      id="text"
-                      type="text"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="profile-picture">Profile Picture</Label>
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-16 w-16">
-                        <AvatarImage alt="@shadcn" src={profilePicture} />
-                        <AvatarFallback>JP</AvatarFallback>
-                      </Avatar>
-                      <Button size="sm" variant="outline">
-                        Change
-                      </Button>
+              {isEditProfileClicked && (
+                <div className="grid gap-4">
+                  <h2 className="text-lg font-semibold">Profile Information</h2>
+                  <form
+                    className="grid gap-4"
+                    onSubmit={(e) =>
+                      handleSaveChanges(e, session, username, bio)
+                    }
+                  >
+                    <div className="grid gap-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        id="username"
+                      />
                     </div>
-                  </div>
-                  <Button className="ml-auto" type="submit">
-                    Save Changes
-                  </Button>
-                </form>
-              </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="text">Bio</Label>
+                      <Input
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        id="text"
+                        type="text"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-picture">Profile Picture</Label>
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16">
+                          <AvatarImage alt="@shadcn" src={profilePicture} />
+                          <AvatarFallback>JP</AvatarFallback>
+                        </Avatar>
+                        <Button size="sm" variant="outline">
+                          Change
+                        </Button>
+                      </div>
+                    </div>
+                    <Button className="ml-auto" type="submit">
+                      Save Changes
+                    </Button>
+                  </form>
+                </div>
+              )}
+              {isProfileUpdated && (
+                <div className="fixed right-0 bottom-0 m-4 p-2 bg-green-500 text-white rounded">
+                  Profile updated successfully
+                </div>
+              )}
             </div>
             <div className="grid gap-6">
               <div className="grid gap-4">

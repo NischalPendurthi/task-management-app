@@ -66,10 +66,20 @@ export const authOptions = {
           email: user.email,
           name: user.username,
           bio: user.bio,
+          role: user.role,
+          profilePicture: user.profilePicture,
+          randomKey: user.randomKey,
         };
       },
     }),
   ],
+  // pages: {
+  //   signIn: `/Dashboard/89`,
+  //   // You can also use a function to dynamically generate the URL
+  //   // signIn: async (url, baseUrl) => {
+  //   //   return Promise.resolve('/custom-signin-url')
+  //   // },
+  // },
   callbacks: {
     session: ({ session, token }) => {
       // console.log("Session Callback", { session, token });
